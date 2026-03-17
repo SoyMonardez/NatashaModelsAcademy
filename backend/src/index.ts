@@ -9,6 +9,7 @@ import newsRoutes from './routes/newsRoutes';
 import carouselRoutes from './routes/carouselRoutes';
 import submissionRoutes from './routes/submissionRoutes';
 import adminRoutes from './routes/adminRoutes';
+import cartRoutes from './routes/cartRoutes';
 
 dotenv.config();
 
@@ -34,6 +35,7 @@ app.use('/api/news', newsRoutes);
 app.use('/api/carousel', carouselRoutes);
 app.use('/api/submissions', submissionRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/cart', cartRoutes);
 
 // Base route for testing
 app.get('/', (req, res) => {

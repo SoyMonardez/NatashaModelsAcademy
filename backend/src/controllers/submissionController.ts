@@ -1,13 +1,37 @@
 import { Request, Response } from 'express';
-import { PrismaClient, FormType } from '@prisma/client';
+import { PrismaClient, FormSubmissionType } from '@prisma/client';
 
 const prisma = new PrismaClient();
+
+// Create a new submission
+export const createSubmission = async (req: Request, res: Response) => {
+  try {
+    const { type, data } = req.body;
+    
+    if (!type || !data) {
+      return res.status(400).json({ error: 'Type and data are required' });
+    }
+
+    const submission = await prisma.formSubmission.create({
+      data: {
+        type: type as FormSubmissionType,
+        data: typeof data === 'string' ? data : JSON.stringify(data),
+        status: 'PENDING'
+      }
+    });
+
+    res.status(201).json(submission);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to create submission' });
+  }
+};
 
 // Get all submissions, optionally filtered by type
 export const getSubmissions = async (req: Request, res: Response) => {
   try {
     const { type } = req.query;
-    const filter = type ? { type: type as FormType } : {};
+    const filter = type ? { type: type as FormSubmissionType } : {};
     
     const submissions = await prisma.formSubmission.findMany({
       where: filter,
