@@ -1,6 +1,6 @@
 # Natasha Models Academy
 
-¡Bienvenido a la academia de modelos más prestigiosa! Este proyecto es una plataforma informativa integral diseñada para brindar toda la información necesaria sobre nuestra academia.
+¡Bienvenido a la academia de modelos más prestigiosa! Este proyecto es una plataforma informativa integral diseñada para brindar toda la información necesaria sobre la academia San Juanina Natasha Models.
 
 ## 🌟 Características del Proyecto
 
@@ -22,4 +22,4 @@ Este proyecto ha sido desarrollado utilizando un stack moderno:
 Todo el proyecto ha sido creado íntegramente desde cero por **Alejo Monardez**.
 
 ---
-© 2026 Natasha Models Academy. Todos los derechos reservados.
+© 2026 Natasha Models Academy.
