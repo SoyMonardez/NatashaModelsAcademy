@@ -1,0 +1,102 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model carouselitem {
+  id        String   @id
+  imageUrl  String
+  title     String?
+  createdAt DateTime @default(now())
+}
+
+model course {
+  id         String      @id
+  title      String
+  youtubeUrl String
+  type       course_type
+  category   String
+  professor  String
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime
+}
+
+model formsubmission {
+  id        String              @id
+  type      formsubmission_type
+  data      String              @db.LongText
+  status    String              @default("PENDING")
+  createdAt DateTime            @default(now())
+  updatedAt DateTime
+}
+
+model image {
+  id        String   @id
+  url       String
+  modelId   String?
+  createdAt DateTime @default(now())
+  model     model?   @relation(fields: [modelId], references: [id], map: "Image_modelId_fkey")
+
+  @@index([modelId], map: "Image_modelId_fkey")
+}
+
+model model {
+  id           String   @id
+  name         String
+  age          Int
+  height       Float
+  sex          String
+  category     String
+  measurements String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime
+  image        image[]
+}
+
+model news {
+  id        String   @id
+  title     String
+  content   String   @db.Text
+  imageUrl  String
+  category  String
+  date      DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+}
+
+model systemsetting {
+  id    String @id
+  key   String @unique(map: "SystemSetting_key_key")
+  value String
+}
+
+model user {
+  id        String    @id
+  email     String    @unique(map: "User_email_key")
+  password  String?
+  name      String?
+  role      user_role @default(USER)
+  googleId  String?   @unique(map: "User_googleId_key")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime
+}
+
+enum formsubmission_type {
+  CONTACT
+  INSCRIPTION
+  MODEL_REQUEST
+}
+
+enum course_type {
+  FREE
+  PREMIUM
+}
+
+enum user_role {
+  USER
+  ADMIN
+}
