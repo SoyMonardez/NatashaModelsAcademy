@@ -1,0 +1,35 @@
+# Node modules
+node_modules/
+
+# Environment variables
+.env
+.env.local
+.env.*
+
+# Build outputs
+dist/
+dist-ssr/
+build/
+bin/
+obj/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Backend specific
+/backend/prisma/migrations/
+/backend/uploads/
+
+# Frontend specific
+/frontend/dist/
