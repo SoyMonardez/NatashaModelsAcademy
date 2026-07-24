@@ -1,0 +1,35 @@
+services:
+  legacy-mysql:
+    image: mariadb:11.4
+    environment: { MARIADB_DATABASE: natasha_legacy, MARIADB_ROOT_PASSWORD: migration-only-password }
+    volumes: ["./u684485898_NatashaModels.sql:/docker-entrypoint-initdb.d/01-legacy.sql:ro"]
+    healthcheck:
+      test: ["CMD-SHELL", "mariadb-admin ping -h localhost -uroot -pmigration-only-password --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    networks: [migration]
+  postgres:
+    image: postgres:16-alpine
+    environment: { POSTGRES_DB: natasha_models, POSTGRES_USER: natasha_app, POSTGRES_PASSWORD: migration-only-password }
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U natasha_app -d natasha_models"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    networks: [migration]
+  migrator:
+    build: { context: ./backend }
+    environment:
+      DATABASE_URL: postgresql://natasha_app:migration-only-password@postgres:5432/natasha_models?schema=public
+      MYSQL_LEGACY_HOST: legacy-mysql
+      MYSQL_LEGACY_PORT: 3306
+      MYSQL_LEGACY_USER: root
+      MYSQL_LEGACY_PASSWORD: migration-only-password
+      MYSQL_LEGACY_DATABASE: natasha_legacy
+    depends_on:
+      legacy-mysql: { condition: service_healthy }
+      postgres: { condition: service_healthy }
+    command: ["sh", "-c", "npx prisma migrate deploy && node scripts/migrate-mysql-to-postgres.js"]
+    networks: [migration]
+networks: { migration: {} }

@@ -1,0 +1,47 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes: [postgres_data:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks: [internal]
+  api:
+    build: { context: ./backend }
+    restart: unless-stopped
+    env_file: .env.production
+    environment: { NODE_ENV: production, PORT: 3001 }
+    depends_on: { db: { condition: service_healthy } }
+    volumes: [api_uploads:/app/uploads]
+    expose: ["3001"]
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3001/ >/dev/null 2>&1"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+    networks: [internal]
+  caddy:
+    image: caddy:2.10-alpine
+    restart: unless-stopped
+    depends_on: { api: { condition: service_healthy } }
+    ports: ["80:80", "443:443"]
+    environment: { SITE_ADDRESS: ${SITE_ADDRESS}, API_ADDRESS: ${API_ADDRESS} }
+    volumes:
+      - ./public_html:/srv:ro
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks: [internal]
+networks: { internal: {} }
+volumes:
+  postgres_data: {}
+  api_uploads: {}
+  caddy_data: {}
+  caddy_config: {}

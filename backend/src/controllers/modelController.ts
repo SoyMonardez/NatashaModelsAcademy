@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+﻿import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import fs from 'fs';
 import path from 'path';
@@ -52,8 +52,6 @@ export const getModelById = async (req: Request, res: Response) => {
 // Create admin-controlled route
 export const createModel = async (req: Request, res: Response) => {
   try {
-    console.log('Create Model Body:', req.body);
-    console.log('Create Model Files:', req.files);
 
     const { name, age, height, sex, category, bust, waist, hips } = req.body;
     const files = req.files as Express.Multer.File[];
@@ -71,7 +69,7 @@ export const createModel = async (req: Request, res: Response) => {
     const numHeight = Number(heightStr);
 
     if (isNaN(numAge) || isNaN(numHeight)) {
-      return res.status(400).json({ error: 'Edad y Altura deben ser números válidos' });
+      return res.status(400).json({ error: 'Edad y Altura deben ser nÃºmeros vÃ¡lidos' });
     }
 
     const newModel = await prisma.model.create({
@@ -95,8 +93,7 @@ export const createModel = async (req: Request, res: Response) => {
     logError('SERVER ERROR (Create)', error);
     res.setHeader('Content-Type', 'application/json');
     return res.status(500).json({ 
-      error: 'Error interno del servidor al crear el modelo',
-      details: error.message || 'Sin detalles'
+      error: 'Error interno del servidor al crear el modelo'
     });
   }
 };
@@ -104,9 +101,6 @@ export const createModel = async (req: Request, res: Response) => {
 export const updateModel = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    console.log('Update Model Request - ID:', id);
-    console.log('Update Model Body:', req.body);
-    console.log('Update Model Files:', req.files);
 
     const { name, age, height, sex, category, bust, waist, hips, existingImages } = req.body;
     const files = req.files as Express.Multer.File[];
@@ -123,20 +117,21 @@ export const updateModel = async (req: Request, res: Response) => {
     const numHeight = Number(heightStr);
 
     if (isNaN(numAge) || isNaN(numHeight)) {
-      return res.status(400).json({ error: 'Edad y Altura deben ser números válidos' });
+      return res.status(400).json({ error: 'Edad y Altura deben ser nÃºmeros vÃ¡lidos' });
     }
 
     let finalImageUrls: string[] = [];
     if (existingImages) {
-        finalImageUrls = Array.isArray(existingImages) ? existingImages : [existingImages];
+        const requestedImages = Array.isArray(existingImages) ? existingImages : [existingImages];
+        finalImageUrls = requestedImages.filter((url: unknown): url is string =>
+          typeof url === 'string' && /^\/uploads\/[a-f0-9-]+\.(jpg|png|webp|gif)$/i.test(url)
+        );
     }
     
     if (files && files.length > 0) {
         const newUrls = files.map(file => `/uploads/${file.filename}`);
         finalImageUrls = [...finalImageUrls, ...newUrls];
     }
-
-    console.log('Final Image URLs to save:', finalImageUrls);
 
     // Check if model exists
     const model = await prisma.model.findUnique({ where: { id: String(id) } });
@@ -167,8 +162,7 @@ export const updateModel = async (req: Request, res: Response) => {
     logError('SERVER ERROR (Update)', error);
     res.setHeader('Content-Type', 'application/json');
     return res.status(500).json({ 
-      error: 'Error interno del servidor al actualizar el modelo', 
-      details: error.message || 'Sin detalles'
+      error: 'Error interno del servidor al actualizar el modelo'
     });
   }
 };
@@ -188,3 +182,4 @@ export const deleteModel = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Failed to delete model' });
   }
 };
+

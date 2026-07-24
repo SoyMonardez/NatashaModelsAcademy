@@ -1,25 +1,22 @@
-import { Request, Response } from 'express';
+﻿import { Request, Response } from 'express';
 import { PrismaClient, FormSubmissionType } from '@prisma/client';
 
 const prisma = new PrismaClient();
+const allowedTypes = new Set(['CONTACT', 'INSCRIPTION', 'MODEL_REQUEST']);
 
-// Create a new submission
 export const createSubmission = async (req: Request, res: Response) => {
   try {
     const { type, data } = req.body;
-    
-    if (!type || !data) {
-      return res.status(400).json({ error: 'Type and data are required' });
+    if (typeof type !== 'string' || !allowedTypes.has(type) || data == null) {
+      return res.status(400).json({ error: 'Invalid submission data' });
     }
-
+    const serialized = typeof data === 'string' ? data : JSON.stringify(data);
+    if (serialized.length < 2 || serialized.length > 20_000) {
+      return res.status(400).json({ error: 'Invalid submission data' });
+    }
     const submission = await prisma.formSubmission.create({
-      data: {
-        type: type as FormSubmissionType,
-        data: typeof data === 'string' ? data : JSON.stringify(data),
-        status: 'PENDING'
-      }
+      data: { type: type as FormSubmissionType, data: serialized, status: 'PENDING' },
     });
-
     res.status(201).json(submission);
   } catch (error) {
     console.error(error);
@@ -27,17 +24,13 @@ export const createSubmission = async (req: Request, res: Response) => {
   }
 };
 
-// Get all submissions, optionally filtered by type
 export const getSubmissions = async (req: Request, res: Response) => {
   try {
-    const { type } = req.query;
-    const filter = type ? { type: type as FormSubmissionType } : {};
-    
+    const type = typeof req.query.type === 'string' && allowedTypes.has(req.query.type) ? req.query.type : undefined;
     const submissions = await prisma.formSubmission.findMany({
-      where: filter,
+      where: type ? { type: type as FormSubmissionType } : {},
       orderBy: { createdAt: 'desc' },
     });
-    
     res.json(submissions);
   } catch (error) {
     console.error(error);
@@ -45,31 +38,22 @@ export const getSubmissions = async (req: Request, res: Response) => {
   }
 };
 
-// Update submission status (e.g. from PENDING to CONTACTED)
 export const updateSubmissionStatus = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
     const { status } = req.body;
-    
-    const updatedSubmission = await prisma.formSubmission.update({
-      where: { id: String(id) },
-      data: { status },
-    });
-
-    res.json(updatedSubmission);
+    if (typeof status !== 'string' || !['PENDING', 'CONTACTED', 'CLOSED'].includes(status)) {
+      return res.status(400).json({ error: 'Invalid status' });
+    }
+    res.json(await prisma.formSubmission.update({ where: { id: String(req.params.id) }, data: { status } }));
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to update submission status' });
   }
 };
 
-// Delete a submission
 export const deleteSubmission = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
-    await prisma.formSubmission.delete({
-      where: { id: String(id) }
-    });
+    await prisma.formSubmission.delete({ where: { id: String(req.params.id) } });
     res.json({ success: true });
   } catch (error) {
     console.error(error);

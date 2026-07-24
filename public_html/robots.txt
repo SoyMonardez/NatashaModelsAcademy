@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /profile
+Disallow: /requests
+Disallow: /api/
+Disallow: /recuperar-contrasena.html
+Disallow: /restablecer-contrasena.html
+
+Sitemap: https://natashamodel.agency/sitemap.xml

@@ -1,35 +1,36 @@
-# Node modules
-node_modules/
-
-# Environment variables
 .env
-.env.local
 .env.*
+!.env.example
+!.env.*.example
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.*.example
 
-# Build outputs
+node_modules/
+**/node_modules/
 dist/
-dist-ssr/
+**/dist/
 build/
-bin/
-obj/
+**/build/
+coverage/
 
-# Logs
+uploads/
+**/uploads/
+postgres_data/
+*.sql
+*.sql.gz
+*.dump
+*.db
+*.sqlite
 *.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
+*.zip
 
-# IDEs and Editors
+.trash/
 .vscode/
 .idea/
-*.swp
-*.swo
 .DS_Store
+Thumbs.db
 
-# Backend specific
-/backend/prisma/migrations/
-/backend/uploads/
-
-# Frontend specific
-/frontend/dist/
+tmp_*
+**/tmp_*

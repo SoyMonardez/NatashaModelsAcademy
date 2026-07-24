@@ -1,0 +1,19 @@
+{$SITE_ADDRESS:natashamodel.agency}, www.{$SITE_ADDRESS:natashamodel.agency} {
+  root * /srv
+  encode zstd gzip
+  @legacyApi path /api /api/*
+  respond @legacyApi 404
+  @assets path /assets/*
+  header @assets Cache-Control "public, max-age=31536000, immutable"
+  header {
+    X-Content-Type-Options "nosniff"
+    Referrer-Policy "strict-origin-when-cross-origin"
+    Permissions-Policy "camera=(), geolocation=(), microphone=()"
+  }
+  try_files {path} {path}/ /index.html
+  file_server
+}
+{$API_ADDRESS:api.natashamodel.agency} {
+  encode zstd gzip
+  reverse_proxy api:3001
+}
