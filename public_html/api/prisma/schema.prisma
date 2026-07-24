@@ -1,0 +1,119 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model CarouselItem {
+  id        String   @id @default(uuid())
+  imageUrl  String
+  title     String?
+  createdAt DateTime @default(now())
+}
+
+model Course {
+  id          String      @id @default(uuid())
+  title       String
+  description String?     @db.Text
+  youtubeUrl  String
+  type        CourseType
+  category    String
+  professor   String
+  duration    String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+enum CourseType {
+  FREE
+  PREMIUM
+}
+
+model FormSubmission {
+  id        String              @id @default(uuid())
+  type      FormSubmissionType
+  data      String              @db.LongText
+  status    String              @default("PENDING")
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
+}
+
+enum FormSubmissionType {
+  CONTACT
+  INSCRIPTION
+  MODEL_REQUEST
+}
+
+model Image {
+  id        String   @id @default(uuid())
+  url       String
+  modelId   String?
+  createdAt DateTime @default(now())
+  model     Model?   @relation(fields: [modelId], references: [id], map: "Image_modelId_fkey")
+
+  @@index([modelId], map: "Image_modelId_fkey")
+}
+
+model Model {
+  id           String   @id @default(uuid())
+  name         String
+  age          Int
+  height       Float
+  sex          String
+  category     String
+  measurements String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  images       Image[]
+  cartItems    CartItem[]
+}
+
+model CartItem {
+  id        String   @id @default(uuid())
+  userId    String
+  modelId   String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  model     Model    @relation(fields: [modelId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, modelId])
+}
+
+model News {
+  id        String   @id @default(uuid())
+  title     String
+  content   String   @db.Text
+  imageUrl  String
+  category  String
+  date      DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SystemSetting {
+  id    String @id @default(uuid())
+  key   String @unique(map: "SystemSetting_key_key")
+  value String
+}
+
+model User {
+  id        String    @id @default(uuid())
+  email     String    @unique(map: "User_email_key")
+  password  String?
+  name      String?
+  role      UserRole @default(USER)
+  googleId  String?   @unique(map: "User_googleId_key")
+  picture   String?   @db.LongText
+  phone     String?
+  location  String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime @updatedAt
+  cartItems CartItem[]
+}
+enum UserRole {
+  USER
+  ADMIN
+}

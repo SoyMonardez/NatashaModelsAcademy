@@ -1,13 +1,14 @@
-import { Router } from 'express';
+﻿import { Router } from 'express';
 import { getModels, getModelById, createModel, updateModel, deleteModel } from '../controllers/modelController';
 import { upload } from '../middleware/upload';
+import { authenticate, authorizeAdmin } from '../middlewares/authMiddleware';
 
 const router = Router();
 
 router.get('/', getModels);
 router.get('/:id', getModelById);
-router.post('/', upload.array('images', 10), createModel);
-router.put('/:id', upload.array('images', 10), updateModel);
-router.delete('/:id', deleteModel);
+router.post('/', authenticate, authorizeAdmin, upload.array('images', 10), createModel);
+router.put('/:id', authenticate, authorizeAdmin, upload.array('images', 10), updateModel);
+router.delete('/:id', authenticate, authorizeAdmin, deleteModel);
 
 export default router;

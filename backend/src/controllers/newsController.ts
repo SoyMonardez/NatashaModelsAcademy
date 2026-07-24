@@ -22,7 +22,16 @@ export const getNews = async (req: Request, res: Response) => {
 
 export const createNews = async (req: Request, res: Response) => {
   try {
-    const { title, content, imageUrl, category, date } = req.body;
+    const { title, content, category, date } = req.body;
+    let imageUrl = req.body.imageUrl;
+
+    if (req.file) {
+      imageUrl = `/uploads/${req.file.filename}`;
+    }
+
+    if (!title || !content || !imageUrl || !category) {
+      return res.status(400).json({ error: 'Faltan campos obligatorios' });
+    }
     
     const newNews = await prisma.news.create({
       data: {
@@ -38,6 +47,34 @@ export const createNews = async (req: Request, res: Response) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to create news' });
+  }
+};
+
+export const updateNews = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { title, content, category, date } = req.body;
+    let imageUrl = req.body.imageUrl;
+
+    if (req.file) {
+      imageUrl = `/uploads/${req.file.filename}`;
+    }
+
+    const updatedNews = await prisma.news.update({
+      where: { id: String(id) },
+      data: {
+        title,
+        content,
+        category,
+        imageUrl: imageUrl || undefined,
+        date: date ? new Date(date) : undefined,
+      }
+    });
+
+    res.json(updatedNews);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to update news' });
   }
 };
 

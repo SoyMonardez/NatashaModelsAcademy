@@ -1,25 +1,63 @@
 # Natasha Models Academy
 
-¡Bienvenido a la academia de modelos más prestigiosa! Este proyecto es una plataforma informativa integral diseñada para brindar toda la información necesaria sobre la academia San Juanina Natasha Models.
+Plataforma web para presentar cursos, modelos, noticias e inscripciones de una academia de modelaje. Incluye un sitio público y un panel de administración para gestionar contenidos.
 
-## 🌟 Características del Proyecto
+**Estado:** aplicación funcional con despliegue mediante Docker y PostgreSQL.
 
-- **Cursos:** Explora nuestra amplia gama de cursos de modelaje y formación profesional.
-- **Modelos:** Conoce a nuestro staff de modelos y gestiona contrataciones directas.
-- **Inscripciones:** Formulario de inscripción sencillo para unirte a la academia.
-- **Noticias:** Mantente al día con los últimos eventos, desfiles y novedades del mundo de la moda.
+## Funcionalidades verificadas
 
-## 🛠️ Tecnologías Utilizadas
+- Gestión de cursos, modelos, noticias y carruseles.
+- Formularios de inscripción y contacto.
+- Carrito y solicitudes relacionadas con cursos.
+- Autenticación del panel administrativo con JWT.
+- Recuperación de contraseña por correo.
+- Carga de imágenes con validación desde el backend.
 
-Este proyecto ha sido desarrollado utilizando un stack moderno:
+## Stack
 
-- **Frontend:** React + Vite + Tailwind CSS
-- **Backend:** Node.js + Express + Prisma (ORM)
-- **Base de Datos:** Configurada según el entorno (vía Prisma)
+- **Frontend:** sitio web/PWA distribuido como archivos estáticos.
+- **Backend:** Node.js, Express y TypeScript.
+- **Base de datos:** PostgreSQL con Prisma.
+- **Infraestructura:** Docker Compose y Caddy.
+- **Integraciones:** correo transaccional y autenticación de Google.
 
-## 👤 Autor
+## Desarrollo del backend
 
-Todo el proyecto ha sido creado íntegramente desde cero por **Alejo Monardez**.
+```bash
+cd backend
+npm install
+npm run dev
+```
 
----
-© 2026 Natasha Models Academy.
+La configuración se crea a partir de `backend/.env.example`. Los valores incluidos son ficticios y deben reemplazarse localmente.
+
+## Validaciones
+
+```bash
+cd backend
+npm run build
+npm test
+```
+
+## Despliegue
+
+Las instrucciones operativas se encuentran en [README-DEPLOYMENT.md](README-DEPLOYMENT.md). Los archivos `.env`, dumps, logs, uploads y copias de producción no deben incluirse en el repositorio.
+
+## Seguridad
+
+- Secretos y credenciales mediante variables de entorno.
+- Contraseñas almacenadas con hash.
+- Autenticación JWT para rutas administrativas.
+- Rate limiting y cabeceras HTTP mediante Helmet.
+- Separación entre la conexión normal de la aplicación y tareas administrativas.
+
+## Limitaciones
+
+- La disponibilidad del envío de correo depende del proveedor configurado.
+- El despliegue necesita una base PostgreSQL y variables propias del entorno.
+- Los datos y recursos de producción no forman parte del repositorio.
+
+## Autor
+
+Alejo Monárdez  
+[Portfolio](https://alejomonardez.com) · [GitHub](https://github.com/SoyMonardez)
